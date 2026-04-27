@@ -1,0 +1,19 @@
+# Copie este arquivo para .env e configure as variáveis
+
+# Supabase Configuration
+VITE_SUPABASE_URL=https://tufvduiaybogfhgausqj.supabase.co
+VITE_SUPABASE_ANON_KEY=sua_anon_key_aqui
+
+# Token secreto para Edge Function
+# IMPORTANTE: Use o mesmo token que configurou no Supabase com:
+# supabase secrets set INSCRICAO_SECRET_TOKEN=seu_token
+VITE_INSCRICAO_SECRET_TOKEN=7a8f9b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a
+
+# ATENÇÃO:
+# - NUNCA commite o arquivo .env no Git
+# - Adicione .env no .gitignore
+# - Use este token padrão apenas para desenvolvimento
+# - Em produção, gere um token novo e seguro
+
+
+

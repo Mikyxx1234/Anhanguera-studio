@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  api-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: anhanguera-api
+    ports:
+      - "3000:3000"
+    environment:
+      DB_HOST: banco_banco
+      DB_PORT: 5432
+      DB_NAME: site_anhanguera
+      DB_USER: postgres
+      DB_PASSWORD: ^&TN5Qkg3BTXpW#eeqHj@E
+      DB_SSL: false
+      SECRET_TOKEN: 7a8f9b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a
+      FRONTEND_URL: https://seu-site.com
+      PORT: 3000
+    restart: unless-stopped
+    networks:
+      - banco-network
+
+networks:
+  banco-network:
+    external: true
+
