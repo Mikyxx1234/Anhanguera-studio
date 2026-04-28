@@ -35,7 +35,7 @@ export default function PolosEADPage() {
       <section
         className="py-8 md:py-16"
         style={{
-          backgroundImage: `url('/Bg_polos banner.png')`,
+          backgroundImage: `url('https://www.soead.com.br/Bg_polos%20banner.png')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat'

@@ -67,7 +67,7 @@ export default function TechnicalCoursesPage() {
       <section 
         className="relative py-8 md:py-16 bg-orange-50 md:bg-transparent"
         style={{
-          backgroundImage: `url('/banner graduacao_novo soead.png')`,
+          backgroundImage: `url('https://www.soead.com.br/banner%20graduacao_novo%20soead.png')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat'

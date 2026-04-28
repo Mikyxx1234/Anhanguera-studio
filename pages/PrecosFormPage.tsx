@@ -161,7 +161,7 @@ export default function PrecosFormPage() {
       <section 
         className="py-6 md:py-12 min-h-screen flex items-center"
         style={{
-          backgroundImage: `url('/BG_Inscreva-se.png')`,
+          backgroundImage: `url('https://www.soead.com.br/BG_Inscreva-se.png')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat'

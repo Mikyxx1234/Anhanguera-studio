@@ -127,7 +127,7 @@ export default function HomePage() {
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage: `url('/Bg_HeroSection_Pos_em_dobro.png')`
+            backgroundImage: `url('https://www.soead.com.br/Bg_HeroSection_Pos_em_dobro.png')`
           }}
         />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-20 w-full">
@@ -285,7 +285,7 @@ export default function HomePage() {
             {/* Right side - Triangles Image */}
             <div className="flex-shrink-0 hidden md:block">
               <img 
-                src="/triangles.png" 
+                src="https://www.soead.com.br/triangles.png" 
                 alt="Decorative triangles" 
                 className="h-20 w-auto object-contain"
               />

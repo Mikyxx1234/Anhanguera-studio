@@ -1,9 +1,31 @@
 node_modules
 npm-debug.log
 .env
-.env.local
+.env.*
+!.env.example
 .git
 .gitignore
-README.md
+.vscode
+.idea
 .DS_Store
+README.md
+*.md
+dist
+build
+coverage
 
+# Arquivos de proxy/backend que não fazem parte do build do frontend
+api-proxy-simples.js
+Dockerfile-proxy
+package-proxy.json
+docker-compose*.yml
+index.js
+
+# SQL e scripts auxiliares (não vão pro container do frontend)
+*.sql
+
+# Imagens de testes/conexão
+testar-conexao.html
+
+# Arquivos temporários do Vite
+vite.config.ts.timestamp-*.mjs
