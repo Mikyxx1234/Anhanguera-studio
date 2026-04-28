@@ -1,4 +1,12 @@
-chore: remover arquivo temporario de mensagem de commit
+fix(deploy): nao ignorar .env no docker build
 
-- Remove .commit-msg.txt que foi subido por engano
-- Ignora .commit-msg.txt no gitignore
+O toggle "Create .env file" do EasyPanel escreve um arquivo .env no
+contexto do build com as Environment Variables configuradas na UI.
+O .dockerignore anterior estava ignorando .env e .env.*, fazendo o
+COPY . . pular esse arquivo. Resultado: vite loadEnv() nao achava
+as variaveis e usava os fallbacks hardcoded em lib/supabase.ts e
+components/SEOHead.tsx (apontando pro projeto antigo do Bolt).
+
+Agora .dockerignore so ignora .env.local e .env.*.local (variaveis
+exclusivas de desenvolvimento), permitindo que o .env do EasyPanel
+flua pro estagio de build do Vite.

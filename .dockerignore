@@ -1,8 +1,11 @@
 node_modules
 npm-debug.log
-.env
-.env.*
-!.env.example
+# IMPORTANTE: NAO ignorar .env aqui!
+# O EasyPanel (toggle "Create .env file") escreve um .env no contexto do build,
+# que e lido pelo loadEnv() do vite.config.ts em build-time. Se ignorarmos,
+# o Vite usa os fallbacks hardcoded em lib/supabase.ts e SEOHead.tsx.
+.env.local
+.env.*.local
 .git
 .gitignore
 .vscode
