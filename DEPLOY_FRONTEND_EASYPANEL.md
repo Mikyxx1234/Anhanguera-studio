@@ -29,11 +29,18 @@ O deploy usa um `Dockerfile` multi-stage que compila os estáticos e os serve vi
 3. Em **Build**, escolha **Dockerfile** (não use Nixpacks/Heroku Buildpacks).
    - Dockerfile path: `Dockerfile` (na raiz)
 4. Em **Network/Ports**, exponha a **porta 80**.
-5. Em **Environment** (opcional, build-time):
-   - `GEMINI_API_KEY` → sua chave do Google Gemini
-   > Essa variável é injetada pelo Vite **em build time** (vide `vite.config.ts`).
-   > No EasyPanel, configure como **Build Arg** se a UI permitir, ou
-   > como variável de ambiente comum (o Docker já passa para o `ENV` no estágio de build).
+5. Em **Environment** configure as variáveis abaixo (todas são **build-time**, pois o Vite embute no bundle):
+
+   | Variável | Obrigatória? | Valor |
+   |---|---|---|
+   | `VITE_SITE_URL` | Sim | URL pública final (ex: `https://app.soead.com.br`). Usada pelo SEO/Open Graph. |
+   | `VITE_SUPABASE_URL` | Sim | URL do projeto Supabase (`https://xxxxx.supabase.co`) |
+   | `VITE_SUPABASE_ANON_KEY` | Sim | Chave **anon** (pública) do Supabase |
+   | `GEMINI_API_KEY` | Opcional | Só se usar funcionalidades de IA (Gemini) |
+
+   > **IMPORTANTE:** essas variáveis precisam estar definidas **na hora do build**.
+   > Se alterar qualquer uma depois, é necessário **rebuildar o container** — restart sozinho não basta.
+   > No EasyPanel, configure em **Environment**; o Docker passa automaticamente para o `ENV` do estágio builder via `ARG`.
 6. Clique em **Deploy**.
 
 ### Domínio
@@ -81,8 +88,13 @@ docker run --rm -p 8080:80 anhanguera-frontend
 # acesse http://localhost:8080
 ```
 
-Para passar a chave do Gemini em build-time:
+Para passar todas as variáveis em build-time:
 
 ```bash
-docker build --build-arg GEMINI_API_KEY=sua_chave -t anhanguera-frontend .
+docker build \
+  --build-arg VITE_SITE_URL=https://app.soead.com.br \
+  --build-arg VITE_SUPABASE_URL=https://SEU_PROJETO.supabase.co \
+  --build-arg VITE_SUPABASE_ANON_KEY=eyJhbGciOi... \
+  --build-arg GEMINI_API_KEY=sua_chave_opcional \
+  -t anhanguera-frontend .
 ```
