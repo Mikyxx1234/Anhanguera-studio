@@ -1,8 +1,4 @@
-chore(deploy): aceitar VITE_* como build args no Dockerfile
+chore: remover arquivo temporario de mensagem de commit
 
-- Dockerfile agora recebe VITE_SITE_URL, VITE_SUPABASE_URL e
-  VITE_SUPABASE_ANON_KEY como ARG, repassando para ENV no estagio
-  builder. Sem isso o Vite nao consegue embutir as variaveis no
-  bundle final durante npm run build.
-- Atualiza DEPLOY_FRONTEND_EASYPANEL.md com a tabela de variaveis
-  obrigatorias e exemplo de docker build com todos os build args.
+- Remove .commit-msg.txt que foi subido por engano
+- Ignora .commit-msg.txt no gitignore
