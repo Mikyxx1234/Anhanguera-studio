@@ -17,18 +17,8 @@ dist
 build
 coverage
 
-# Arquivos de proxy/backend que não fazem parte do build do frontend
-api-proxy-simples.js
-Dockerfile-proxy
-package-proxy.json
-docker-compose*.yml
+# Backend (index.js) nao faz parte do build do frontend
 index.js
 
-# SQL e scripts auxiliares (não vão pro container do frontend)
-*.sql
-
-# Imagens de testes/conexão
-testar-conexao.html
-
-# Arquivos temporários do Vite
+# Arquivos temporarios do Vite
 vite.config.ts.timestamp-*.mjs
