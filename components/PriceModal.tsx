@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Send } from 'lucide-react';
 import { CourseService } from '../services/courseService';
 import { InscricaoService } from '../services/inscricaoService';
+import { useRecaptcha } from '../hooks/useRecaptcha';
 
 interface Course {
   id: number;
@@ -31,6 +32,7 @@ export default function PriceModal({ isOpen, onClose, course }: PriceModalProps)
   const [priceSource, setPriceSource] = useState<'database' | 'fallback'>('fallback');
   const [isLoadingPrice, setIsLoadingPrice] = useState(false);
   const [selectedDuration, setSelectedDuration] = useState<'normal' | 'intensive'>('normal');
+  const { recaptchaRef, getToken, resetRecaptcha, renderRecaptcha } = useRecaptcha();
 
   // Parse modalities from course data
   const getModalities = (course: Course) => {
@@ -46,8 +48,13 @@ export default function PriceModal({ isOpen, onClose, course }: PriceModalProps)
       setSelectedDuration('normal'); // Sempre começar com a duração normal (menor preço)
       setShowPrice(false); // Resetar visualização de preço
       setFormData({ name: '', phone: '', modality: '' }); // Limpar formulário
+
+      // Renderizar reCAPTCHA quando modal abrir
+      setTimeout(() => {
+        renderRecaptcha();
+      }, 100);
     }
-  }, [isOpen]);
+  }, [isOpen, renderRecaptcha]);
 
   // Função para buscar o preço do curso
   const fetchCoursePrice = async (courseName: string, modality: string) => {
@@ -73,7 +80,14 @@ export default function PriceModal({ isOpen, onClose, course }: PriceModalProps)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
+    // Validar reCAPTCHA
+    const recaptchaToken = getToken();
+    if (!recaptchaToken) {
+      alert('Por favor, complete a verificação do reCAPTCHA.');
+      return;
+    }
+
     setIsSubmitting(true);
     
     // If single modality, set it automatically
@@ -117,6 +131,7 @@ export default function PriceModal({ isOpen, onClose, course }: PriceModalProps)
         campanha: new URLSearchParams(window.location.search).get('utm_campaign') || null,
         status: 'novo',
         nome_curso: course.name, // Nome do curso em campo separado
+        recaptcha_token: recaptchaToken // Token do reCAPTCHA
       };
 
       const result = await InscricaoService.saveInscricao(inscricaoData);
@@ -128,7 +143,10 @@ export default function PriceModal({ isOpen, onClose, course }: PriceModalProps)
       } else {
         console.log('✅ Inscrição salva com sucesso!');
       }
-      
+
+      // Resetar reCAPTCHA após envio bem-sucedido
+      resetRecaptcha();
+
       // Buscar preço do curso
       await fetchCoursePrice(course.name, finalFormData.modality);
     } catch (error) {
@@ -336,6 +354,11 @@ export default function PriceModal({ isOpen, onClose, course }: PriceModalProps)
                   </select>
                 </div>
               )}
+
+              {/* reCAPTCHA v2 Widget */}
+              <div className="flex justify-center my-4">
+                <div ref={recaptchaRef}></div>
+              </div>
 
               <button
                 type="submit"
