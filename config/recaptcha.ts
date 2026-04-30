@@ -3,7 +3,7 @@
  */
 
 export const RECAPTCHA_CONFIG = {
-  siteKey: '6LdEmQ8sAAAAAPyDti04sPqnvlqX7nB8QSkIi7zk',
+  siteKey: '6LcEmdIsAAAAAGTLKETumGFHCb4WoPaS0ZQ7c__c',
   version: 'v2',
   theme: 'light', // 'light' ou 'dark'
   size: 'normal', // 'normal' ou 'compact'

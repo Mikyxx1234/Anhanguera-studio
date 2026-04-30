@@ -11,6 +11,7 @@ import { professionalCourses } from '../data/professionalCourses';
 import { technicalCourses } from '../data/technicalCourses';
 import SEOHead from '../components/SEOHead';
 import PriceModal from '../components/PriceModal';
+import { getCourseImage, placeholderImage } from '../utils/courseImage';
 
 // Combined interface for all courses
 interface Course {
@@ -122,11 +123,12 @@ export default function CourseDetailPage() {
         {/* Mobile Version Background */}
         <div className="lg:hidden absolute inset-0">
           <img 
-            src={category === 'graduacao' 
-              ? `https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=1600`
-              : `https://images.unsplash.com/photo-1541339907198-e08759df9a73?auto=format&fit=crop&q=80&w=1600`
-            }
+            src={getCourseImage(course)}
             alt={course.name}
+            onError={(e) => {
+              const fb = placeholderImage(`${course.id}-${course.name}`, 1600, 900);
+              if (e.currentTarget.src !== fb) e.currentTarget.src = fb;
+            }}
             className="w-full h-full object-cover opacity-30"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#0a0f1d] via-transparent to-[#0a0f1d]/50"></div>
@@ -187,11 +189,12 @@ export default function CourseDetailPage() {
               <div className="bg-[#161d2f] lg:bg-white rounded-3xl overflow-hidden border border-white/5 lg:border-gray-200 shadow-2xl lg:shadow-orange-500/10">
                 <div className="aspect-video w-full overflow-hidden">
                   <img 
-                    src={category === 'graduacao' 
-                      ? `https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=800`
-                      : `https://images.unsplash.com/photo-1541339907198-e08759df9a73?auto=format&fit=crop&q=80&w=800`
-                    }
+                    src={getCourseImage(course)}
                     alt={course.name}
+                    onError={(e) => {
+                      const fb = placeholderImage(`${course.id}-${course.name}`, 800, 450);
+                      if (e.currentTarget.src !== fb) e.currentTarget.src = fb;
+                    }}
                     className="w-full h-full object-cover"
                   />
                 </div>
