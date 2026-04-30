@@ -158,6 +158,46 @@ const validateOrigin = (req, res, next) => {
   */
 };
 
+// ========================================
+// reCAPTCHA v2 - validação server-side
+// ========================================
+// Se RECAPTCHA_SECRET_KEY não estiver definida, a validação é pulada
+// com um warning (mantém retrocompatibilidade enquanto a env não for
+// configurada no painel do EasyPanel).
+const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY;
+
+async function verifyRecaptcha(token, remoteIp) {
+  if (!RECAPTCHA_SECRET_KEY) {
+    console.warn('⚠️  RECAPTCHA_SECRET_KEY não configurada - validação desabilitada');
+    return { ok: true, skipped: true };
+  }
+  if (!token) {
+    return { ok: false, reason: 'token-missing' };
+  }
+  try {
+    const params = new URLSearchParams({
+      secret: RECAPTCHA_SECRET_KEY,
+      response: token,
+    });
+    if (remoteIp) params.set('remoteip', remoteIp);
+
+    const r = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: params.toString(),
+    });
+    const data = await r.json();
+
+    if (data.success) {
+      return { ok: true, score: data.score, hostname: data.hostname };
+    }
+    return { ok: false, reason: 'google-rejected', errors: data['error-codes'] };
+  } catch (err) {
+    console.error('❌ Erro ao validar reCAPTCHA:', err);
+    return { ok: false, reason: 'verify-error' };
+  }
+}
+
 // Conexão com PostgreSQL
 const pool = new Pool({
   host: process.env.DB_HOST,
@@ -224,7 +264,8 @@ app.post('/api/inscricoes', rateLimiter, async (req, res) => {
     pagina,
     campanha,
     status,
-    nome_curso
+    nome_curso,
+    recaptcha_token
   } = req.body;
 
   // Validação básica
@@ -236,6 +277,25 @@ app.post('/api/inscricoes', rateLimiter, async (req, res) => {
       required: ['nome_completo', 'celular', 'tipo_de_curso'],
       received: { nome_completo, celular, tipo_de_curso }
     });
+  }
+
+  // Validação do reCAPTCHA (server-side via API do Google)
+  const clientIp = req.headers['x-forwarded-for']?.split(',')[0]?.trim()
+    || req.socket?.remoteAddress
+    || null;
+  const recaptchaResult = await verifyRecaptcha(recaptcha_token, clientIp);
+  if (!recaptchaResult.ok) {
+    console.error('❌ reCAPTCHA inválido:', recaptchaResult);
+    return res.status(403).json({
+      error: 'reCAPTCHA inválido',
+      reason: recaptchaResult.reason,
+      details: recaptchaResult.errors
+    });
+  }
+  if (recaptchaResult.skipped) {
+    console.log('ℹ️  reCAPTCHA pulado (secret não configurada)');
+  } else {
+    console.log('✅ reCAPTCHA validado pelo Google');
   }
 
   try {
