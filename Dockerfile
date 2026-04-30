@@ -1,41 +1,20 @@
-# syntax=docker/dockerfile:1.6
+FROM node:18-alpine
 
-# ============================================================
-# STAGE 1 — Build do frontend (Vite/React)
-# ============================================================
-FROM node:20-alpine AS builder
-
+# Criar diretório da aplicação
 WORKDIR /app
 
-# Variáveis injetadas em build-time pelo Vite.
-# Tudo que tem prefixo VITE_ é embutido no bundle final via import.meta.env.
-# GEMINI_API_KEY é injetada via define() no vite.config.ts (process.env).
-ARG GEMINI_API_KEY=""
-ARG VITE_SITE_URL=""
-ARG VITE_SUPABASE_URL=""
-ARG VITE_SUPABASE_ANON_KEY=""
+# Copiar arquivos de dependências
+COPY package*.json ./
 
-ENV GEMINI_API_KEY=$GEMINI_API_KEY \
-    VITE_SITE_URL=$VITE_SITE_URL \
-    VITE_SUPABASE_URL=$VITE_SUPABASE_URL \
-    VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY
+# Instalar dependências
+RUN npm install --production
 
-COPY package.json package-lock.json ./
-RUN npm ci
-
+# Copiar código da aplicação
 COPY . .
 
-RUN npm run build
+# Expor porta
+EXPOSE 3000
 
-# ============================================================
-# STAGE 2 — Servir os estáticos com nginx
-# ============================================================
-FROM nginx:1.27-alpine AS runner
+# Comando para iniciar
+CMD ["npm", "start"]
 
-RUN rm -rf /usr/share/nginx/html/*
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=builder /app/dist /usr/share/nginx/html
-
-EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]

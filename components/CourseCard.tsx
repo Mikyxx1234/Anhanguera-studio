@@ -1,5 +1,6 @@
 import React from 'react';
-import { Clock, Monitor, GraduationCap, ArrowRight, CheckCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Clock, Monitor, GraduationCap, ArrowRight, CheckCircle, Info } from 'lucide-react';
 
 interface Course {
   id: number;
@@ -17,10 +18,11 @@ interface CourseCardProps {
   course: Course;
   onViewPrice: (course: Course) => void;
   showPrices: boolean;
+  category: string;
   key?: React.Key;
 }
 
-export default function CourseCard({ course, onViewPrice, showPrices }: CourseCardProps) {
+export default function CourseCard({ course, onViewPrice, showPrices, category }: CourseCardProps) {
   const [showPosModal, setShowPosModal] = React.useState(false);
 
   const PosDoSeuJeitoModal = () => (
@@ -63,9 +65,16 @@ export default function CourseCard({ course, onViewPrice, showPrices }: CourseCa
               <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-orange-600 transition-colors duration-300">
                 {course.name}
               </h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
+              <p className="text-gray-600 text-sm leading-relaxed mb-3">
                 {course.description}
               </p>
+              <Link 
+                to={`/curso/${category}/${course.id}`}
+                className="inline-flex items-center text-xs font-bold text-orange-600 hover:text-orange-700 hover:underline transition-all"
+              >
+                <Info className="w-3 h-3 mr-1" />
+                Ver detalhes do curso
+              </Link>
             </div>
           </div>
 

@@ -1,85 +1,57 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter } from 'lucide-react';
+import { Search, ChevronDown, Clock, GraduationCap, ArrowRight, ChevronUp, Filter } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { graduationCourses as fallbackCourses, courseAreas as fallbackAreas } from '../data/courses';
-import CourseCard from '../components/CourseCard';
+import GraduationCourseCard from '../components/GraduationCourseCard';
 import PriceModal from '../components/PriceModal';
 import SEOHead from '../components/SEOHead';
-import Breadcrumb from '../components/Breadcrumb';
 import { CourseService } from '../services/courseService';
 
-import { useNavigate } from 'react-router-dom';
-
 export default function GraduationPage() {
-  const navigate = useNavigate();
-  const [selectedArea, setSelectedArea] = useState('Todos');
-  const [selectedModality, setSelectedModality] = useState('Todas');
+  const [selectedArea, setSelectedArea] = useState('Todas as Areas');
+  const [selectedModality, setSelectedModality] = useState('Todas as Modalidades');
   const [searchTerm, setSearchTerm] = useState('');
   const [visibleCourses, setVisibleCourses] = useState(9);
   const [selectedCourse, setSelectedCourse] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [sortBy, setSortBy] = useState('Mais Populares');
+  const [openFilters, setOpenFilters] = useState<string[]>([]);
   
-  // Estados para dados do banco
-  const [graduationCourses, setGraduationCourses] = useState<any[]>([]);
-  const [courseAreas, setCourseAreas] = useState<string[]>(fallbackAreas);
+  const [graduationCourses, setGraduationCourses] = useState<any[]>(fallbackCourses);
+  const [courseAreas, setCourseAreas] = useState<string[]>(['Todas as Areas', 'Negocios', 'Tecnologia', 'Saude', 'Juridico', 'Educacao']);
   const [isLoading, setIsLoading] = useState(true);
-  const [loadError, setLoadError] = useState(false);
-  
-  // Estado para controlar exibição de preços
-  const [showPrices, setShowPrices] = useState(false);
 
-  // Detectar parâmetro ?show=prices na URL (uma única vez)
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const shouldShowPrices = urlParams.get('show') === 'prices';
-    
-    if (shouldShowPrices) {
-      setShowPrices(true);
-      // Limpar o parâmetro da URL
-      window.history.replaceState({}, '', window.location.pathname);
-    }
-    
-    // Limpar storages antigos
-    localStorage.removeItem('showPrices');
-    sessionStorage.removeItem('showPrices');
-  }, []);
+  // Toggle filter accordion
+  const toggleFilter = (filter: string) => {
+    setOpenFilters(prev => 
+      prev.includes(filter) ? prev.filter(f => f !== filter) : [...prev, filter]
+    );
+  };
 
-  // Carregar cursos do banco ao montar o componente
+  // Carregar dados
   useEffect(() => {
-    // Sempre mostrar cursos fallback primeiro (carregamento instantâneo)
-    setGraduationCourses(fallbackCourses);
-    
-    const loadCourses = async () => {
+    const loadData = async () => {
       setIsLoading(true);
-      setLoadError(false);
-      
       try {
-        // Tentar buscar cursos do banco
         const courses = await CourseService.getAllGraduationCourses();
+        if (courses && courses.length > 0) setGraduationCourses(courses);
         
-        if (courses && courses.length > 0) {
-          console.log('✅ Cursos carregados do banco:', courses.length);
-          setGraduationCourses(courses);
-        } else {
-          // Manter fallback se banco não retornar nada
-          console.warn('⚠️ Usando cursos fallback');
-          setLoadError(true);
-        }
-        
-        // Buscar áreas disponíveis
         const areas = await CourseService.getCourseAreas();
         if (areas && areas.length > 1) {
-          setCourseAreas(areas);
+          setCourseAreas(['Todas as Areas', ...areas.filter(a => a !== 'Todos')]);
         }
       } catch (error) {
-        console.error('❌ Erro ao carregar cursos do banco:', error);
-        // Manter fallback em caso de erro
-        setLoadError(true);
+        console.error('Error loading data:', error);
       } finally {
         setIsLoading(false);
       }
     };
+    loadData();
 
-    loadCourses();
+    // Abrir filtros por padrão no desktop (lg breakpoint)
+    if (window.innerWidth >= 1024) {
+      setOpenFilters(['area', 'modality']);
+    }
   }, []);
 
   const handleViewPrice = (course: any) => {
@@ -87,208 +59,219 @@ export default function GraduationPage() {
     setIsModalOpen(true);
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setSelectedCourse(null);
-  };
-
   const filteredCourses = graduationCourses.filter(course => {
-    const matchesArea = selectedArea === 'Todos' || course.area === selectedArea;
-    const matchesModality = selectedModality === 'Todas' || 
-      course.modality.includes(selectedModality) || 
-      (selectedModality === 'EAD' && course.modality.includes('EAD')) ||
-      (selectedModality === 'Presencial' && course.modality.includes('Presencial')) ||
-      (selectedModality === 'Semipresencial' && course.modality.includes('Semipresencial'));
+    const matchesArea = selectedArea === 'Todas as Areas' || course.area === selectedArea;
+    const matchesModality = selectedModality === 'Todas as Modalidades' || 
+      course.modality.toLowerCase().includes(selectedModality.toLowerCase());
     const matchesSearch = course.name.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesArea && matchesModality && matchesSearch;
   });
 
   const coursesToShow = filteredCourses.slice(0, visibleCourses);
-  const hasMoreCourses = filteredCourses.length > visibleCourses;
-
-  const loadMoreCourses = () => {
-    setVisibleCourses(prev => prev + 9);
-  };
 
   return (
-    <div className="pt-16 min-h-screen bg-gray-50">
+    <div className="pt-20 min-h-screen bg-gray-50 text-gray-900 selection:bg-orange-500/30">
       <SEOHead
-        title="Graduação EAD e Semipresencial - Anhanguera"
-        description="Encontre a graduação perfeita para transformar sua carreira. Mais de 80 cursos de bacharelado, licenciatura e tecnólogo reconhecidos pelo MEC."
+        title="Graduações EAD e Semipresencial | Anhanguera"
+        description="Explore nossa grade completa de cursos de graduacao da Anhanguera, com diploma reconhecido pelo MEC e mensalidades que cabem no seu bolso."
         path="/graduacao"
-        image="/banner graduacao_novo soead.png"
       />
-      
-      {/* Breadcrumb */}
-      <Breadcrumb items={[{ label: 'Graduação' }]} />
-      
-      {/* Header */}
-      <section 
-        className="relative py-8 md:py-16 bg-orange-50 md:bg-transparent"
-        style={{
-          backgroundImage: `url('https://www.soead.com.br/banner%20graduacao_novo%20soead.png')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
-        }}
-      >
-        <style jsx>{`
-          @media (max-width: 768px) {
-            section {
-              background-image: none !important;
-            }
-          }
-        `}</style>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-2xl md:text-5xl font-bold text-orange-500 mb-2 md:mb-4">
-             Graduação EAD ou Semipresencial
-          </h1>
-          <p className="text-base md:text-xl text-gray-900 max-w-2xl mx-auto">
-           Encontre a graduação perfeita para transformar sua carreira e conquistar seus sonhos.
-          </p>
-        </div>
-      </section>
 
-      <section className="py-4 md:py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Título da Busca */}
-          <div className="text-center mb-4 md:mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-1 md:mb-2">
-              Busque seu curso
-            </h2>
-            <p className="text-sm md:text-base text-gray-600">
-              Encontre o curso ideal para sua carreira
+      {/* Hero Section */}
+      <section className="bg-white border-b border-gray-100 py-8 md:py-12">
+        <div className="max-w-7xl mx-auto px-4 md:px-8">
+          <div className="max-w-3xl">
+            <h1 className="text-3xl md:text-5xl font-black mb-4 tracking-tight text-gray-900 leading-tight">
+              Graduações <span className="text-orange-600 italic">EAD e Semipresencial.</span>
+            </h1>
+            <p className="text-sm md:text-lg text-gray-500 leading-relaxed max-w-2xl font-medium">
+              Explore nossa grade completa de cursos de graduacao da Anhanguera, com diploma reconhecido pelo MEC e mensalidades que cabem no seu bolso.
             </p>
           </div>
-
-          {/* Filtros */}
-          <div className="bg-white p-4 md:p-6 rounded-xl shadow-md mb-4 md:mb-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
-              {/* Busca */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-800 mb-2">Buscar Curso</label>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                  <input
-                    type="text"
-                    placeholder="Buscar curso..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-9 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300"
-                  />
-                </div>
-              </div>
-
-              {/* Filtro por Área */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-800 mb-2">Área</label>
-                <div className="relative">
-                  <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                  <select
-                    value={selectedArea}
-                    onChange={(e) => setSelectedArea(e.target.value)}
-                    className="w-full pl-9 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300 appearance-none bg-white"
-                  >
-                    {courseAreas.map(area => (
-                      <option key={area} value={area}>{area}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* Filtro por Modalidade */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-800 mb-2">Modalidade</label>
-                <div className="relative">
-                  <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                  <select
-                    value={selectedModality}
-                    onChange={(e) => setSelectedModality(e.target.value)}
-                    className="w-full pl-9 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300 appearance-none bg-white"
-                  >
-                    <option value="Todas">Todas</option>
-                    <option value="EAD">EAD</option>
-                    <option value="Semipresencial">Semipresencial</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Resultados */}
-          <div className="mb-4 md:mb-6 text-gray-600 text-sm md:text-base">
-            Mostrando {filteredCourses.length} curso{filteredCourses.length !== 1 ? 's' : ''}
-            {selectedArea !== 'Todos' && ` em ${selectedArea}`}
-            {selectedModality !== 'Todas' && ` na modalidade ${selectedModality}`}
-            {searchTerm && ` para "${searchTerm}"`}
-          </div>
-
-          {/* Loading State */}
-          {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="bg-white rounded-xl shadow-md p-6 animate-pulse">
-                  <div className="h-6 bg-gray-200 rounded mb-4"></div>
-                  <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                  <div className="h-10 bg-gray-200 rounded mt-4"></div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            /* Grid de Cursos */
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
-              {coursesToShow.map((course) => (
-                <CourseCard 
-                  key={course.id} 
-                  course={course} 
-                  onViewPrice={handleViewPrice}
-                  showPrices={showPrices}
-                />
-              ))}
-            </div>
-          )}
-
-          {/* Botão Ver Mais */}
-          {hasMoreCourses && (
-            <div className="text-center mt-6 md:mt-12">
-              <button
-                onClick={loadMoreCourses}
-                className="bg-gradient-to-r from-orange-500 to-orange-600 text-white font-bold py-2 md:py-3 px-6 md:px-8 rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-300 shadow-lg text-sm md:text-base"
-              >
-                Ver mais cursos
-              </button>
-            </div>
-          )}
-
-          {filteredCourses.length === 0 && (
-            <div className="text-center py-12">
-              <div className="text-gray-500 mb-4">
-                <Search className="w-12 h-12 mx-auto mb-4" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">
-                Nenhum curso encontrado
-              </h3>
-              <p className="text-gray-600">
-                Tente ajustar os filtros ou entre em contato conosco para mais opções
-              </p>
-              <button
-                onClick={() => navigate('/precos-form')}
-                className="mt-6 bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition-all duration-300"
-              >
-                Fale Conosco
-              </button>
-            </div>
-          )}
         </div>
-
-        {/* Modal de Preço */}
-        <PriceModal 
-          isOpen={isModalOpen}
-          onClose={closeModal}
-          course={selectedCourse}
-        />
       </section>
+
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-12">
+        <div className="flex flex-col lg:flex-row gap-12">
+          
+          {/* Sidebar Filters */}
+          <aside className="w-full lg:w-64 flex-shrink-0 space-y-4 md:space-y-6">
+            {/* Area Filter Accordion */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+              <button 
+                onClick={() => toggleFilter('area')}
+                className="w-full flex items-center justify-between p-5 text-left transition-colors hover:bg-gray-50"
+              >
+                <div className="flex items-center gap-2">
+                  <Filter className="w-4 h-4 text-orange-600" />
+                  <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Area de Conhecimento</h3>
+                </div>
+                {openFilters.includes('area') ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
+              </button>
+              
+              <AnimatePresence>
+                {openFilters.includes('area') && (
+                  <motion.div 
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3, ease: 'easeInOut' }}
+                    className="overflow-hidden"
+                  >
+                    <div className="p-4 pt-0 space-y-1">
+                      {courseAreas.map((area) => (
+                        <button
+                          key={area}
+                          onClick={() => setSelectedArea(area)}
+                          className={`w-full text-left px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                            selectedArea === area 
+                              ? 'bg-orange-50 text-orange-600 border border-orange-100' 
+                              : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+                          }`}
+                        >
+                          {area}
+                        </button>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Modality Filter Accordion */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+              <button 
+                onClick={() => toggleFilter('modality')}
+                className="w-full flex items-center justify-between p-5 text-left transition-colors hover:bg-gray-50"
+              >
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-orange-600" />
+                  <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Modalidade</h3>
+                </div>
+                {openFilters.includes('modality') ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
+              </button>
+              
+              <AnimatePresence>
+                {openFilters.includes('modality') && (
+                  <motion.div 
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3, ease: 'easeInOut' }}
+                    className="overflow-hidden"
+                  >
+                    <div className="p-4 pt-0 space-y-1">
+                      {['Todas as Modalidades', 'EAD', 'Semipresencial'].map((modality) => (
+                        <button
+                          key={modality}
+                          onClick={() => setSelectedModality(modality)}
+                          className={`w-full text-left px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                            selectedModality === modality 
+                              ? 'bg-orange-50 text-orange-600 border border-orange-100' 
+                              : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+                          }`}
+                        >
+                          {modality}
+                        </button>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </aside>
+
+          {/* Main Content */}
+          <main className="flex-grow">
+            {/* Mobile Search Bar (Top of Content) */}
+            <div className="mb-8 relative group">
+              <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none">
+                <Search className="w-5 h-5 text-gray-400 group-focus-within:text-orange-500 transition-colors" />
+              </div>
+              <input
+                type="text"
+                placeholder="Buscar curso por nome ou área..."
+                className="w-full bg-white border border-gray-200 rounded-2xl py-4 pl-14 pr-6 focus:ring-2 focus:ring-orange-500/10 focus:border-orange-500 transition-all outline-none text-gray-900 placeholder-gray-400 font-medium shadow-sm"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+
+            {/* Toolbar */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-10 pb-6 border-b border-gray-200">
+              <div className="text-sm font-bold text-gray-500 uppercase tracking-wider">
+                <span className="text-gray-900">{filteredCourses.length}</span> cursos encontrados
+              </div>
+              
+              <div className="flex items-center gap-6">
+                <div className="flex items-center gap-3 text-xs font-bold">
+                  <span className="text-gray-400">Ordenar por:</span>
+                  <div className="relative">
+                    <select 
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value)}
+                      className="bg-white border border-gray-200 rounded-lg px-4 py-2 pr-10 appearance-none focus:outline-none focus:border-orange-500 transition-colors cursor-pointer text-gray-700"
+                    >
+                      <option>Mais Populares</option>
+                      <option>Menor Valor</option>
+                      <option>Nome A-Z</option>
+                    </select>
+                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Grid */}
+            {isLoading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="bg-white h-[450px] rounded-2xl animate-pulse border border-gray-100 shadow-sm"></div>
+                ))}
+              </div>
+            ) : filteredCourses.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {coursesToShow.map((course) => (
+                  <GraduationCourseCard 
+                    key={course.id}
+                    course={course}
+                    onViewPrice={handleViewPrice}
+                    category="graduacao"
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-gray-200 shadow-sm">
+                <p className="text-gray-400 font-bold">Nenhum curso encontrado com esses filtros.</p>
+                <button 
+                  onClick={() => { setSelectedArea('Todas as Areas'); setSelectedModality('Todas as Modalidades'); setSearchTerm(''); }}
+                  className="mt-4 text-orange-600 text-sm font-bold hover:underline"
+                >
+                  Limpar todos os filtros
+                </button>
+              </div>
+            )}
+
+            {/* Load More */}
+            {filteredCourses.length > visibleCourses && (
+              <div className="mt-16 text-center">
+                <button 
+                  onClick={() => setVisibleCourses(prev => prev + 9)}
+                  className="bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 px-10 py-4 rounded-xl font-bold transition-all shadow-sm"
+                >
+                  Carregar mais cursos
+                </button>
+              </div>
+            )}
+          </main>
+        </div>
+      </div>
+
+      <PriceModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        course={selectedCourse}
+      />
     </div>
   );
 }

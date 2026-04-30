@@ -6,8 +6,11 @@ export const graduationCourses = [
     formation: "Bacharelado",
     modality: "EAD/Presencial",
     area: "Negócios",
-    description: "Se você se imagina trabalhando em grandes empresas, em funções executivas e com uma visão ampla dos negócios, a graduação em Administração é uma boa opção. ",
-    price: 299.90
+    description: "Forme-se gestor de excelência com foco em estratégia, finanças e liderança empresarial.",
+    price: 299.90,
+    image: "https://images.unsplash.com/photo-1454165833767-027ffea9e778?auto=format&fit=crop&q=80&w=800",
+    rating: 4.9,
+    badge: "Mais Procurado"
   },
   {
     id: 2,
@@ -16,8 +19,11 @@ export const graduationCourses = [
     formation: "Bacharelado",
     modality: "EAD/Presencial",
     area: "Negócios",
-    description: "Domine as estratégias do marketing digital e tradicional",
-    price: 279.90
+    description: "Estratégia, branding, marketing digital e comportamento do consumidor para o mercado atual.",
+    price: 279.90,
+    image: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&q=80&w=800",
+    rating: 4.8,
+    badge: "Mais Procurado"
   },
   {
     id: 3,
@@ -26,8 +32,10 @@ export const graduationCourses = [
     formation: "Bacharelado",
     modality: "Presencial",
     area: "Engenharia",
-    description: "Construa o futuro com conhecimento técnico sólido",
-    price: 599.90
+    description: "Construa o futuro com conhecimento técnico sólido em estruturas, saneamento e estradas.",
+    price: 599.90,
+    image: "https://images.unsplash.com/photo-1503387762-592dee58c16b?auto=format&fit=crop&q=80&w=800",
+    rating: 4.7
   },
   {
     id: 4,
@@ -36,8 +44,11 @@ export const graduationCourses = [
     formation: "Bacharelado",
     modality: "EAD/Presencial", 
     area: "Tecnologia",
-    description: "Desenvolva soluções tecnológicas inovadoras",
-    price: 349.90
+    description: "Desenvolva soluções tecnológicas inovadoras e gerencie sistemas de informação complexos.",
+    price: 349.90,
+    image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&q=80&w=800",
+    rating: 4.9,
+    badge: "Top 1"
   },
   {
     id: 5,
@@ -46,8 +57,10 @@ export const graduationCourses = [
     formation: "Bacharelado",
     modality: "Presencial",
     area: "Saúde",
-    description: "Cuide vidas com formação humanizada e técnica",
-    price: 899.90
+    description: "Cuide vidas com formação humanizada e técnica em hospitais, clínicas e saúde pública.",
+    price: 899.90,
+    image: "https://images.unsplash.com/photo-1505751172107-16d2e67dfedc?auto=format&fit=crop&q=80&w=800",
+    rating: 4.8
   },
   {
     id: 6,
@@ -56,8 +69,10 @@ export const graduationCourses = [
     formation: "Bacharelado",
     modality: "Presencial",
     area: "Saúde",
-    description: "Compreenda a mente humana e transforme vidas",
-    price: 799.90
+    description: "Compreenda a mente humana, comportamento e processos mentais para transformar vidas.",
+    price: 799.90,
+    image: "https://images.unsplash.com/photo-1527137342181-19aab11a8ee1?auto=format&fit=crop&q=80&w=800",
+    rating: 4.7
   },
   {
     id: 7,
@@ -66,8 +81,10 @@ export const graduationCourses = [
     formation: "Bacharelado",
     modality: "Presencial",
     area: "Humanas",
-    description: "Defenda a justiça com formação jurídica completa",
-    price: 699.90
+    description: "Defenda a justiça com formação jurídica completa em direito civil, penal e trabalhista.",
+    price: 699.90,
+    image: "https://images.unsplash.com/photo-1589829545856-d10d14912239?auto=format&fit=crop&q=80&w=800",
+    rating: 5.0
   },
   {
     id: 8,
@@ -76,8 +93,10 @@ export const graduationCourses = [
     formation: "Licenciatura",
     modality: "EAD/Presencial",
     area: "Humanas", 
-    description: "Forme o futuro através da educação",
-    price: 249.90
+    description: "Forme o futuro através da educação infantil, gestão escolar e processos de ensino.",
+    price: 249.90,
+    image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&q=80&w=800",
+    rating: 4.6
   }
 ];
 

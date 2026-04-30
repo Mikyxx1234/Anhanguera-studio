@@ -18,6 +18,7 @@ import NotFoundPage from './pages/NotFoundPage';
 import SearchResultsPage from './pages/SearchResultsPage';
 import BlogPage from './pages/BlogPage';
 import BlogPostPage from './pages/BlogPostPage';
+import CourseDetailPage from './pages/CourseDetailPage';
 import { useSessionTracker } from './hooks/useSessionTracker';
 
 function SessionTracker() {
@@ -45,6 +46,7 @@ export default function App() {
             <Route path="/blog/:slug" element={<BlogPostPage />} />
             <Route path="/faq" element={<FAQPage />} />
             <Route path="/precos-form" element={<PrecosFormPage />} />
+            <Route path="/curso/:category/:id" element={<CourseDetailPage />} />
             <Route path="/resultados" element={<SearchResultsPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>

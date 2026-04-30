@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { Search, Filter, ArrowRight } from 'lucide-react';
 import { graduationCourses } from '../data/courses';
 import { postGradCourses } from '../data/courses';
@@ -22,10 +22,10 @@ export default function SearchResultsPage() {
 
   // Combine all courses with their types
   const allCourses = [
-    ...graduationCourses.map(course => ({ ...course, type: 'Graduação', category: 'graduation' })),
-    ...postGradCourses.map(course => ({ ...course, type: 'Pós-Graduação', category: 'postgrad' })),
-    ...technicalCourses.map(course => ({ ...course, type: 'Curso Técnico', category: 'technical' })),
-    ...professionalCourses.map(course => ({ ...course, type: 'Curso Profissionalizante', category: 'professional' }))
+    ...graduationCourses.map(course => ({ ...course, type: 'Graduação', category: 'graduacao' })),
+    ...postGradCourses.map(course => ({ ...course, type: 'Pós-Graduação', category: 'pos-mba' })),
+    ...technicalCourses.map(course => ({ ...course, type: 'Curso Técnico', category: 'cursos-tecnicos' })),
+    ...professionalCourses.map(course => ({ ...course, type: 'Curso Profissionalizante', category: 'cursos-profissionalizantes' }))
   ];
 
   // Get all unique areas
@@ -59,9 +59,9 @@ export default function SearchResultsPage() {
     type: course.formation === 'MBA' || course.formation === 'Especialista' ? 'Pós-Graduação' :
           course.formation === 'Técnico' ? 'Curso Técnico' :
           course.formation === 'Profissionalizante' ? 'Curso Profissionalizante' : 'Graduação',
-    category: course.formation === 'MBA' || course.formation === 'Especialista' ? 'postgrad' :
-              course.formation === 'Técnico' ? 'technical' :
-              course.formation === 'Profissionalizante' ? 'professional' : 'graduation'
+    category: course.formation === 'MBA' || course.formation === 'Especialista' ? 'pos-mba' :
+              course.formation === 'Técnico' ? 'cursos-tecnicos' :
+              course.formation === 'Profissionalizante' ? 'cursos-profissionalizantes' : 'graduacao'
   }));
 
   const handleViewPrice = (course: any) => {
@@ -134,13 +134,21 @@ export default function SearchResultsPage() {
         </div>
 
         {/* CTA */}
-        <button
-          onClick={() => onViewPrice(course)}
-          className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white font-medium py-3 px-4 rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-300 flex items-center justify-center space-x-2 group"
-        >
-          <span>Ver preço</span>
-          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
-        </button>
+        <div className="space-y-4">
+          <Link 
+            to={`/curso/${course.category}/${course.id}`}
+            className="inline-flex items-center text-xs font-bold text-orange-600 hover:text-orange-700 hover:underline transition-all"
+          >
+            Ver detalhes do curso
+          </Link>
+          <button
+            onClick={() => onViewPrice(course)}
+            className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white font-medium py-3 px-4 rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-300 flex items-center justify-center space-x-2 group"
+          >
+            <span>Ver preço</span>
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
+          </button>
+        </div>
       </div>
     </div>
   );

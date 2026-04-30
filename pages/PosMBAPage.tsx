@@ -119,7 +119,7 @@ export default function PosMBAPage() {
       <section 
         className="relative py-8 md:py-24 bg-orange-50 md:bg-transparent"
         style={{
-          backgroundImage: `url('https://www.soead.com.br/banner%20graduacao_novo%20soead.png')`,
+          backgroundImage: `url('/banner graduacao_novo soead.png')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat'
@@ -283,6 +283,7 @@ export default function PosMBAPage() {
                   course={course} 
                   onViewPrice={handleViewPrice}
                   showPrices={showPrices}
+                  category="pos-mba"
                 />
               ))}
             </div>

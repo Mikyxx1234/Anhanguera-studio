@@ -19,8 +19,7 @@ export class InscricaoService {
         pagina: inscricao.pagina,
         campanha: inscricao.campanha,
         status: inscricao.status || 'novo',
-        nome_curso: inscricao.nome_curso || null,
-        recaptcha_token: inscricao.recaptcha_token || null
+        nome_curso: inscricao.nome_curso || null
       };
 
       console.log('📤 Enviando inscrição para API:', dadosParaInserir);

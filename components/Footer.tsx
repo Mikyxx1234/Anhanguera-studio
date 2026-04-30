@@ -151,7 +151,7 @@ Ao preencher e enviar qualquer formulário disponível neste site, você declara
           <div className="space-y-2 md:space-y-4 flex flex-col items-center md:items-start">
             <div className="flex items-center space-x-2">
               <img 
-                src="https://www.soead.com.br/Logo%20Anhanguera_site_soead_branca.png" 
+                src="/Logo Anhanguera_site_soead_branca.png" 
                 alt="Anhanguera Logo" 
                 className="h-12 md:h-16 w-auto"
               />
