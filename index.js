@@ -8,6 +8,7 @@ const PORT = process.env.PORT || 3000;
 
 // Domínios permitidos
 const ALLOWED_ORIGINS = [
+  'http://localhost:3000',
   'http://localhost:5173',
   'http://localhost:4173',
   'http://localhost:5174',
@@ -16,6 +17,8 @@ const ALLOWED_ORIGINS = [
   'https://soead.com.br',
   'http://soead.com.br',
   'soead.com.br',
+  'banco-anhanguera-studio.6tqx2r.easypanel.host',
+  'easypanel.host',
   'vercel.app',
   'bolt.new',
   'stackblitz.com',

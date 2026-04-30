@@ -123,13 +123,14 @@ export default function HomePage() {
       />
       
       {/* Hero Section */}
-      <section className="relative min-h-[50vh] md:min-h-[70vh] flex items-center">
+      <section className="relative min-h-[50vh] md:min-h-[70vh] flex items-center bg-orange-500">
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
             backgroundImage: `url('/Bg_HeroSection_Pos_em_dobro.png')`
           }}
         />
+        <div className="absolute inset-0 bg-gradient-to-r from-orange-600/70 via-orange-500/40 to-transparent" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-20 w-full">
           <div className="max-w-3xl text-left">
             <h1 className="text-3xl md:text-6xl font-bold text-white mb-4 md:mb-6 leading-tight">

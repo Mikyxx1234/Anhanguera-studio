@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Clock, GraduationCap, Star, ArrowRight, Monitor } from 'lucide-react';
+import { getCourseImage, placeholderImage } from '../utils/courseImage';
 
 interface Course {
   id: number;
@@ -24,13 +25,25 @@ interface GraduationCourseCardProps {
 }
 
 export default function GraduationCourseCard({ course, onViewPrice, category }: GraduationCourseCardProps) {
+  const initialSrc = getCourseImage(course);
+
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    const fb = placeholderImage(`${course.id}-${course.name}`);
+    if (img.src !== fb) {
+      img.src = fb;
+    }
+  };
+
   return (
     <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 group transition-all duration-300 hover:border-orange-500/20 hover:shadow-2xl hover:shadow-orange-500/5 flex flex-col h-full shadow-sm">
       {/* Image Container */}
-      <div className="relative h-48 overflow-hidden">
+      <div className="relative h-48 overflow-hidden bg-gradient-to-br from-orange-100 to-orange-200">
         <img 
-          src={course.image || "https://images.unsplash.com/photo-1523050853063-bd8012fec21b?auto=format&fit=crop&q=80&w=800"} 
+          src={initialSrc}
           alt={course.name}
+          loading="lazy"
+          onError={handleImageError}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
         />
         

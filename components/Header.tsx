@@ -111,7 +111,7 @@ export default function Header() {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
             <img 
-              src="/Logo Anhanguera_site_soead.png" 
+              src="https://www.soead.com.br/Logo%20Anhanguera_site_soead.png" 
               alt="Anhanguera Logo" 
               className="h-10 w-auto"
             />
