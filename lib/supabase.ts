@@ -60,4 +60,5 @@ export interface Inscricao {
   status?: string;
   data_de_criacao?: string;
   nome_curso?: string | null;
+  recaptcha_token?: string | null;
 }
