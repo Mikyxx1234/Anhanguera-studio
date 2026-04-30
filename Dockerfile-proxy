@@ -1,8 +1,0 @@
-FROM node:18-alpine
-WORKDIR /app
-COPY package-proxy.json package.json
-RUN npm install --production
-COPY api-proxy-simples.js .
-EXPOSE 3000
-CMD ["npm", "start"]
-
